@@ -1,7 +1,5 @@
 @extends('layouts.master')
 
-@section('title', 'Edit Job Posting')
-
 @section('content')
     <div class="container">
         <h1 class="mb-4">Edit Job Posting</h1>

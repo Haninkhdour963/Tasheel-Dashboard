@@ -9,7 +9,7 @@
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
-  
+
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
@@ -19,7 +19,7 @@
        <link href="{{ asset('assets/css/styles.css') }}" rel="stylesheet">
 
 
- 
+
 </head>
 <body>
     <div id="app">

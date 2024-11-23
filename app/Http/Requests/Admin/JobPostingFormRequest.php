@@ -11,7 +11,7 @@ class JobPostingFormRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true; // Adjust this based on your application's authentication and authorization logic
+       return true;
     }
 
     /**
@@ -22,14 +22,14 @@ class JobPostingFormRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id' => 'required|exists:users,user_id',  // Make sure client_id exists in users table
+            'client_id' => 'required|exists:users,user_id',  // Ensure the client exists in the users table
             'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category_id' => 'required|exists:categories,category_id',
-            'location' => 'nullable|string|max:255',
+            'description' => 'required|string',
+            'category_id' => 'required|exists:categories,category_id',  // Ensure the category exists
+            'location' => 'required|string|max:255',
             'budget' => 'required|numeric|min:0',
             'status' => 'required|in:pending,in_progress,completed,cancelled',
-            'posted_at' => 'required|date_format:Y-m-d H:i:s', // Adjust if your format differs
+            'posted_at' => 'required|date',  // Ensure it's a valid date
         ];
     }
 }

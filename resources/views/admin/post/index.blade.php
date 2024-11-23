@@ -8,7 +8,7 @@
 <div class="card mt-4">
 <div class="card-header">
 <h4> View posts
-<a href="{{ url('admin/add-posts')}}" class="btn btn-primary float-end">Add posts</a>   
+<a href="{{ url('admin/add-post')}}" class="btn btn-primary float-end">Add posts</a>
 </h4>
 </div>
 <div class="card-body">
@@ -30,17 +30,17 @@
 <tbody>
 @foreach($posts as $item)
 <tr>
- <td>{{ $item->id}}</td>  
+ <td>{{ $item->id}}</td>
 <td>{{ $item->category ? $item->category->name : 'No Category' }}</td>
 
- <td>{{ $item->name}}</td>  
- <td>{{ $item->status == '1' ? 'Hidden':'Visable'}}</td>   
+ <td>{{ $item->name}}</td>
+ <td>{{ $item->status == '1' ? 'Hidden':'Visable'}}</td>
  <td>
-  <a href="{{ url('admin/post/'.$item->id)}}" class="btn btn-success">Edit</a>  
- </td>  
+  <a href="{{ url('admin/post/'.$item->id)}}" class="btn btn-success">Edit</a>
+ </td>
  <td>
-  <a href="{{ url('admin/delete-post/'.$item->id)}}" class="btn btn-danger">Delete</a>  
- </td> 
+  <a href="{{ url('admin/delete-post/'.$item->id)}}" class="btn btn-danger">Delete</a>
+ </td>
 </tr>
 @endforeach
 </tbody>

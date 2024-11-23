@@ -43,7 +43,7 @@
                 <div class="collapse" id="collapseDispute" aria-labelledby="headingDispute" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="{{url('admin/add-dispute')}}">Add Dispute</a>
-                        <a class="nav-link" href="{{url('admin/disputes')}}">View Dispute</a>
+                        <a class="nav-link" href="{{url('admin/dispute')}}">View Dispute</a>
                     </nav>
                 </div>
 
@@ -55,11 +55,10 @@
                 </a>
                 <div class="collapse" id="collapseEscrowPayment" aria-labelledby="headingEscrowPayment" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{url('admin/add-escrowPayment')}}">Add Escrow Payment</a>
+                        <a class="nav-link" href="{{url('admin/add-escrow-payment')}}">Add Escrow Payment</a>
                         <a class="nav-link" href="{{url('admin/escrowPayments')}}">View Escrow Payment</a>
                     </nav>
                 </div>
-
                 <!-- Job Bids Section -->
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseJobBids" aria-expanded="false" aria-controls="collapseJobBids">
                     <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
@@ -68,8 +67,8 @@
                 </a>
                 <div class="collapse" id="collapseJobBids" aria-labelledby="headingJobBids" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{url('admin/add-jobBid')}}">Add Job Bid</a>
-                        <a class="nav-link" href="{{url('admin/jobBids')}}">View Job Bid</a>
+                        <a class="nav-link" href="{{ url('admin/add-job-bid') }}">Add Job Bid</a>
+                        <a class="nav-link" href="{{ url('admin/job-bids') }}">View Job Bids</a>
                     </nav>
                 </div>
 
@@ -82,7 +81,7 @@
                 <div class="collapse" id="collapseJobPostings" aria-labelledby="headingJobPostings" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="{{url('admin/add-jobPosting')}}">Add Job Posting</a>
-                        <a class="nav-link" href="{{url('admin/jobPostings')}}">View Job Postings</a>
+                        <a class="nav-link" href="{{url('admin/jobPosting')}}">View Job Postings</a>
                     </nav>
                 </div>
 
@@ -94,7 +93,7 @@
                 </a>
                 <div class="collapse" id="collapseReviews" aria-labelledby="headingReviews" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{url('admin/add-review')}}">Add Review</a>
+{{--                        <a class="nav-link" href="{{url('admin/add-review')}}">Add Review</a>--}}
                         <a class="nav-link" href="{{url('admin/reviews')}}">View Reviews</a>
                     </nav>
                 </div>
@@ -130,17 +129,6 @@
                     Users
                 </a>
 
-                <!-- Charts -->
-                <a class="nav-link" href="charts.html">
-                    <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                    Charts
-                </a>
-
-                <!-- Tables -->
-                <a class="nav-link" href="tables.html">
-                    <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
-                    Tables
-                </a>
             </div>
         </div>
         <div class="sb-sidenav-footer">

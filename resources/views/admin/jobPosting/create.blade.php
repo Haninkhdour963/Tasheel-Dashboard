@@ -1,3 +1,5 @@
+<!-- resources/views/admin/job-postings/create.blade.php -->
+
 @extends('layouts.master')
 
 @section('title', 'Add Job Posting')
@@ -9,85 +11,61 @@
                 <h4>Add New Job Posting</h4>
             </div>
             <div class="card-body">
-
-                <!-- Display validation errors -->
-                @if($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <!-- Job Posting Form -->
-                <form action="{{ route('admin.job_postings.store') }}" method="POST">
+                <form action="{{ url('admin/add-jobPosting') }}" method="POST">
                     @csrf
 
-                    <!-- Job Title -->
-                    <div class="form-group mb-3">
-                        <label for="title">Job Title</label>
-                        <input type="text" name="title" id="title" class="form-control @error('title') is-invalid @enderror" value="{{ old('title') }}" required>
-                        @error('title')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <div class="mb-3">
+                        <label for="client_id" class="form-label">Client ID</label>
+                        <input type="number" class="form-control" id="client_id" name="client_id" required>
                     </div>
 
-                    <!-- Budget -->
-                    <div class="form-group mb-3">
-                        <label for="budget">Budget</label>
-                        <input type="text" name="budget" id="budget" class="form-control @error('budget') is-invalid @enderror" value="{{ old('budget') }}" required>
-                        @error('budget')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Job Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
                     </div>
 
-                    <div class="form-group mb-3">
-                        <label for="status">Status</label>
-                        <select name="status" id="status" class="form-control @error('status') is-invalid @enderror">
-                            <option value="pending" {{ old('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                            <option value="in_progress" {{ old('status') == 'in_progress' ? 'selected' : '' }}>In Progress</option>
-                            <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                            <option value="cancelled" {{ old('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Job Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                    </div>
+
+{{--                    <div class="mb-3">--}}
+{{--                        <label for="category_id" class="form-label">Category</label>--}}
+{{--                        <select class="form-control" id="category_id" name="category_id" required>--}}
+{{--                            <option value="">Select a Category</option>--}}
+{{--                            @foreach ($categories as $category)--}}
+{{--                                <option value="{{ $category->category_id }}">{{ $category->name }}</option>--}}
+{{--                            @endforeach--}}
+{{--                        </select>--}}
+{{--                    </div>--}}
+
+                    <div class="mb-3">
+                        <label for="location" class="form-label">Location</label>
+                        <input type="text" class="form-control" id="location" name="location" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="budget" class="form-label">Budget</label>
+                        <input type="number" step="0.01" class="form-control" id="budget" name="budget" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-control" id="status" name="status" required>
+                            <option value="pending">Pending</option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
                         </select>
-                        @error('status')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
 
-
-                    <!-- Location -->
-                    <div class="form-group mb-3">
-                        <label for="location">Location</label>
-                        <input type="text" name="location" id="location" class="form-control @error('location') is-invalid @enderror" value="{{ old('location') }}" required>
-                        @error('location')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                    <div class="mb-3">
+                        <label for="posted_at" class="form-label">Posted At</label>
+                        <input type="datetime-local" class="form-control" id="posted_at" name="posted_at" required>
                     </div>
 
-                    <!-- Job Description -->
-                    <div class="form-group mb-3">
-                        <label for="description">Job Description</label>
-                        <textarea name="description" id="description" class="form-control @error('description') is-invalid @enderror" rows="5">{{ old('description') }}</textarea>
-                        @error('description')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-
-                    <!-- Date (If Needed) -->
-                    {{-- <div class="form-group">
-                        <label for="posted_at">Available From</label>
-                        <input type="date" name="posted_at" id="posted_at" class="form-control @error('posted_at') is-invalid @enderror" value="{{ old('posted_at') }}" required>
-                        @error('posted_at')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div> --}}
-
-                    <!-- Submit Button -->
                     <button type="submit" class="btn btn-primary mt-3">Save Job Posting</button>
                 </form>
-
             </div>
         </div>
     </div>
