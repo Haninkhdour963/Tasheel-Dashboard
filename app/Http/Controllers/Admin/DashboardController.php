@@ -27,7 +27,7 @@ class DashboardController extends Controller
     public function users()
     {
         $users = User::all();
-        return view('admin.users.index', compact('users'));
+        return view('admin.user.index', compact('users'));
     }
 
     public function addUser(Request $request)
@@ -59,7 +59,7 @@ class DashboardController extends Controller
     public function categories()
     {
         $categories = Category::all();
-        return view('admin.categories.index', compact('categories'));
+        return view('admin.category.index', compact('categories'));
     }
 
     public function addCategory(Request $request)
