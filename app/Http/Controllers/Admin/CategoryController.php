@@ -5,98 +5,65 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\File;
-use App\Http\Requests\Admin\CategoryFormRequest;
+use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
     public function index()
     {
-        // Paginate categories to improve performance
-        $categories = Category::withTrashed()->paginate(10);
-        return view('admin.category.index', compact('categories'));
+        // Get all categories including soft deleted ones
+        $categories = Category::withTrashed()->get();
+        return view('admin.categories.index', compact('categories'));
     }
 
-    public function create()
+    public function store(Request $request)
     {
-        return view('admin.category.create');
+        $request->validate([
+            'category_name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category_icon' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        $imagePath = $request->file('category_icon')->store('category_icon', 'public');
+
+        // Store category data
+        $category = Category::create([
+            'category_name' => $request->category_name,
+            'description' => $request->description,
+            'category_icon' => $imagePath,
+        ]);
+
+        return response()->json(['success' => true, 'category' => $category]);
     }
 
-    public function store(CategoryFormRequest $request)
+    public function update(Request $request, $id)
     {
-        $data = $request->validated();
-        $category = new Category();
+        $request->validate([
+            'category_name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'category_icon' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
 
-        // Fill attributes
-        $category->fill($data);
-
-        // Handle image upload
-        if ($request->hasFile('image')) {
-            $category->image = $this->uploadImage($request->file('image'));
+        $category = Category::findOrFail($id);
+        if ($request->hasFile('category_icon')) {
+            // Delete old image
+            Storage::delete('public/' . $category->category_icon);
+            // Store new image
+            $category->category_icon = $request->file('category_icon')->store('category_icon', 'public');
         }
 
-        $category->navbar_status = $request->navbar_status ? '1' : '0';
-        $category->status = $request->status ? '1' : '0';
-        $category->created_by = Auth::id();
+        $category->category_name = $request->category_name;
+        $category->description = $request->description;
         $category->save();
 
-        return redirect('admin/category')->with('message', 'Category added successfully.');
+        return response()->json(['success' => true, 'category' => $category]);
     }
 
-    public function edit($category_id)
+    public function softDelete($id)
     {
-        $category = Category::findOrFail($category_id);
-        return view('admin.category.edit', compact('category'));
-    }
+        $category = Category::findOrFail($id);
+        $category->delete();
 
-    public function update(CategoryFormRequest $request, $category_id)
-    {
-        $category = Category::findOrFail($category_id);
-        $data = $request->validated();
-
-        // Update attributes
-        $category->fill($data);
-
-        // Handle image update
-        if ($request->hasFile('image')) {
-            if ($category->image && File::exists('uploads/category/' . $category->image)) {
-                File::delete('uploads/category/' . $category->image);
-            }
-            $category->image = $this->uploadImage($request->file('image'));
-        }
-
-        $category->navbar_status = $request->navbar_status ? '1' : '0';
-        $category->status = $request->status ? '1' : '0';
-        $category->update();
-
-        return redirect('admin/category')->with('message', 'Category updated successfully.');
-    }
-
-    public function destroy($category_id)
-    {
-        $category = Category::findOrFail($category_id);
-
-        if ($category->image && File::exists('uploads/category/' . $category->image)) {
-            File::delete('uploads/category/' . $category->image);
-        }
-
-        $category->delete(); // Perform soft delete
-        return redirect('admin/category')->with('message', 'Category deleted successfully.');
-    }
-
-    public function restore($category_id)
-    {
-        $category = Category::withTrashed()->findOrFail($category_id);
-
-        $category->restore();
-        return redirect('admin/category')->with('message', 'Category restored successfully.');
-    }
-
-    private function uploadImage($file)
-    {
-        $filename = time() . '.' . $file->getClientOriginalExtension();
-        $file->move('uploads/category/', $filename);
-        return $filename;
+        return response()->json(['success' => true]);
     }
 }

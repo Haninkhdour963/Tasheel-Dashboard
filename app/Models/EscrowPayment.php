@@ -8,24 +8,22 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class EscrowPayment extends Model
 {
+    use HasFactory,SoftDeletes;
 
-    use HasFactory, SoftDeletes;
+    protected $fillable = ['job_id', 'client_id', 'technician_id', 'amount_min', 'amount_max', 'status'];
 
-    protected $primaryKey = 'payment_id';
-    protected $fillable = ['job_id', 'client_id', 'Technician_id', 'amount', 'status'];
-
-    public function jobPosting()
+    public function job()
     {
-        return $this->belongsTo(JobPosting::class, 'job_id', 'job_id');
+        return $this->belongsTo(JobPosting::class, 'job_id');
     }
 
     public function client()
     {
-        return $this->belongsTo(User::class, 'client_id', 'user_id');
+        return $this->belongsTo(User::class, 'client_id');
     }
 
     public function technician()
     {
-        return $this->belongsTo(User::class, 'Technician_id', 'user_id');
+        return $this->belongsTo(Technician::class, 'technician_id');
     }
 }

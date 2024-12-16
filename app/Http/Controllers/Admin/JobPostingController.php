@@ -3,96 +3,85 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\JobPostingFormRequest;
 use App\Models\JobPosting;
 use Illuminate\Http\Request;
 
 class JobPostingController extends Controller
 {
+    public function __construct() {
+        $this->middleware('auth');
+        $this->middleware('role:admin');
+    }
     /**
-     * Display a listing of job postings.
-     *
-     * @return \Illuminate\Http\Response
+     * Display a listing of the resource.
      */
     public function index()
     {
-        $jobPostings = JobPosting::all(); // You can add filters or pagination as necessary.
-        return view('admin.jobPosting.index', compact('jobPostings'));
+        // Fetch all JobPostings with their related Category and Client (User), including soft-deleted ones
+        $jobPostings = JobPosting::with(['category', 'client'])->withTrashed()->get();
+        return view('admin.jobPostings.index', compact('jobPostings'));
     }
 
     /**
-     * Show the form for creating a new job posting.
-     *
-     * @return \Illuminate\Http\Response
+     * Soft delete the JobPosting.
+     */
+    public function softDelete($id)
+    {
+        $jobPosting = JobPosting::findOrFail($id);
+
+        // Soft delete the job posting
+        $jobPosting->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+
+
+    /**
+     * Show the form for creating a new resource.
      */
     public function create()
     {
-        // You may need to pass data like categories or users if required.
-    return view('admin.jobPosting.create');
+        //
     }
 
     /**
-     * Store a newly created job posting in storage.
-     *
-     * @param  \App\Http\Requests\Admin\JobPostingFormRequest  $request
-     * @return \Illuminate\Http\Response
+     * Store a newly created resource in storage.
      */
-    public function store(JobPostingFormRequest $request)
+    public function store(Request $request)
     {
-        $data = $request->validated();
-        JobPosting::create($data); // Automatically handles fillable fields due to $fillable in the model
-        return redirect()->route('admin.job_postings.index')->with('success', 'Job Posting created successfully.');
+        //
     }
 
     /**
-     * Display the specified job posting.
-     *
-     * @param  int  $job_id
-     * @return \Illuminate\Http\Response
+     * Display the specified resource.
      */
-    public function show($job_id)
+    public function show(string $id)
     {
-        $jobPosting = JobPosting::findOrFail($job_id);
-        return view('admin.job_postings.show', compact('jobPosting'));
+        //
     }
 
     /**
-     * Show the form for editing the specified job posting.
-     *
-     * @param  int  $job_id
-     * @return \Illuminate\Http\Response
+     * Show the form for editing the specified resource.
      */
-    public function edit($job_id)
+    public function edit(string $id)
     {
-        $jobPosting = JobPosting::findOrFail($job_id);
-        return view('admin.job_postings.edit', compact('jobPosting'));
+        //
     }
 
     /**
-     * Update the specified job posting in storage.
-     *
-     * @param  \App\Http\Requests\Admin\JobPostingFormRequest  $request
-     * @param  int  $job_id
-     * @return \Illuminate\Http\Response
+     * Update the specified resource in storage.
      */
-    public function update(JobPostingFormRequest $request, $job_id)
+    public function update(Request $request, string $id)
     {
-        $jobPosting = JobPosting::findOrFail($job_id);
-        $data = $request->validated();
-        $jobPosting->update($data);
-        return redirect()->route('admin.job_postings.index')->with('success', 'Job Posting updated successfully.');
+        //
     }
 
     /**
-     * Remove the specified job posting from storage.
-     *
-     * @param  int  $job_id
-     * @return \Illuminate\Http\Response
+     * Remove the specified resource from storage.
      */
-    public function destroy($job_id)
+    public function destroy(string $id)
     {
-        $jobPosting = JobPosting::findOrFail($job_id);
-        $jobPosting->delete(); // Soft delete due to SoftDeletes trait
-        return redirect()->route('admin.job_postings.index')->with('success', 'Job Posting deleted successfully.');
+        //
     }
 }

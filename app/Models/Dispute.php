@@ -5,25 +5,30 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 class Dispute extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory,SoftDeletes;
 
-    protected $primaryKey = 'dispute_id';
-    protected $fillable = ['job_id', 'client_id', 'Technician_id', 'reason', 'status', 'resolution'];
+    protected $fillable = ['job_id', 'initiator_id', 'technician_id', 'client_id', 'dispute_reason', 'status'];
 
-    public function jobPosting()
+    public function job()
     {
-        return $this->belongsTo(JobPosting::class, 'job_id', 'job_id');
+        return $this->belongsTo(JobPosting::class, 'job_id');
     }
 
-    public function client()
+    public function initiator()
     {
-        return $this->belongsTo(User::class, 'client_id', 'user_id');
+        return $this->belongsTo(User::class, 'initiator_id');
     }
 
     public function technician()
     {
-        return $this->belongsTo(User::class, 'Technician_id', 'user_id');
+        return $this->belongsTo(Technician::class, 'technician_id');
+    }
+
+    public function client()
+    {
+        return $this->belongsTo(User::class, 'client_id');
     }
 }

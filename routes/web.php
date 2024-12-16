@@ -1,145 +1,119 @@
 <?php
 
-use App\Http\Controllers\Admin\JobBidController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\TechnicianProfileController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\EscrowPaymentController;
-use App\Http\Controllers\Admin\ReviewController;
-use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Admin\TechnicianController as AdminTechnicianController;
+use App\Http\Controllers\Admin\AdminController as AdminAdminController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\JobPostingController as AdminJobPostingController;
+use App\Http\Controllers\Admin\JobBidController as AdminJobBidController;
+use App\Http\Controllers\Admin\EscrowPaymentController as AdminEscrowPaymentController;
+use App\Http\Controllers\Admin\PaymentController as AdminPaymentController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\Admin\DisputeController as AdminDisputeController;
+use App\Http\Controllers\Admin\ContactController as AdminContactController;
+use App\Http\Controllers\Admin\AdminActionController as AdminAdminActionController;
+use App\Http\Controllers\Client\DashboardController as ClientDashboard;
+use App\Http\Controllers\Technician\DashboardController as TechnicianDashboard;
 
+use Illuminate\Support\Facades\Auth;
 
+/*
+|--------------------------------------------------------------------------|
+| Web Routes                                                              |
+|--------------------------------------------------------------------------|
+| Here is where you can register web routes for your application. These   |
+| routes are loaded by the RouteServiceProvider and all of them will      |
+| be assigned to the "web" middleware group. Make something great!         |
+*/
 
-
-// Public Routes
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Authentication Routes
-Auth::routes();
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-// Client Routes
-Route::middleware(['auth'])->group(function () {
-    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+// Profile routes
+Route::middleware('auth')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Admin Routes
-Route::prefix('admin')->middleware(['auth', 'isAdmin'])->group(function () {
-    Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
-    Route::resource('disputes', App\Http\Controllers\Admin\DisputeController::class);
+// Authenticated user group for role-based access
+Route::middleware(['auth'])->group(function () {
+    // Admin Routes
+    Route::prefix('admin')->middleware('role:admin')->group(function () {
+        Route::get('/dashboard', [AdminDashboard::class, 'index'])->name('admin.dashboard');
+
+        // Users routes with resource and soft delete
+        Route::resource('users', AdminUserController::class);
+        Route::post('users/{id}/soft-delete', [AdminUserController::class, 'softDelete'])->name('users.softDelete');
+
+        // Admins routes
+        Route::resource('admins', AdminAdminController::class);
+        Route::post('admins/{id}/soft-delete', [AdminAdminController::class, 'softDelete'])->name('admins.softDelete');
+
+        // JobPosting Routes
+        Route::resource('jobPostings', AdminJobPostingController::class);
+        Route::post('/jobPostings/{id}/soft-delete', [AdminJobPostingController::class, 'softDelete'])->name('jobPostings.softDelete');
+
+        // Soft delete route for JobBids
+        Route::post('jobBids/{id}/soft-delete', [AdminJobBidController::class, 'softDelete'])->name('admin.jobBids.softDelete');
+
+        // Soft delete route for escrowPayments
+        Route::post('escrowPayments/{id}/soft-delete', [AdminEscrowPaymentController::class, 'softDelete'])->name('admin.escrowPayments.softDelete');
+
+        // Soft delete and restore routes for reviews
+        Route::post('reviews/{id}/softDelete', [AdminReviewController::class, 'softDelete'])->name('admin.reviews.softDelete');
+        Route::post('reviews/{id}/restore', [AdminReviewController::class, 'restore'])->name('admin.reviews.restore');
+        Route::resource('reviews', AdminReviewController::class);  // This will handle the index route
+
+        // Technician Routes
+        Route::resource('technicians', AdminTechnicianController::class);
+        Route::post('technicians/{id}/soft-delete', [AdminTechnicianController::class, 'softDelete'])->name('technicians.softDelete');
+
+        // Categories, Disputes, Contacts, and AdminActions resources
+        Route::resource('categories', AdminCategoryController::class);
+        Route::post('categories/{id}/soft-delete', [AdminCategoryController::class, 'softDelete'])->name('categories.softDelete');
 
 
 
-    Route::prefix('admin')->middleware('auth')->group(function () {
-        Route::get('dashboard', [DashboardController::class, 'index']);
-        Route::get('users', [DashboardController::class, 'users']);
-        Route::post('add-user', [DashboardController::class, 'addUser']);
-        Route::delete('delete-user/{id}', [DashboardController::class, 'deleteUser']);
+        Route::resource('jobPostings', AdminJobPostingController::class);
+        Route::resource('jobBids', AdminJobBidController::class);
+        Route::resource('escrowPayments', AdminEscrowPaymentController::class);
+        Route::resource('payments', AdminPaymentController::class);
+        
+        // Dispute Routes (Including soft delete and restore functionality)
+        Route::get('disputes', [AdminDisputeController::class, 'index'])->name('disputes.index');
+        Route::post('disputes/{id}/softDelete', [AdminDisputeController::class, 'softDelete'])->name('disputes.softDelete');
+        Route::post('disputes/{id}/restore', [AdminDisputeController::class, 'restore'])->name('disputes.restore');
+        Route::resource('disputes', AdminDisputeController::class); // This will handle the index route
+        
+        Route::resource('contacts', AdminContactController::class);
+        Route::post('contacts/{id}/soft-delete', [AdminContactController::class, 'softDelete'])->name('contacts.softDelete');
+        Route::post('contacts/{id}/restore', [AdminContactController::class, 'restore'])->name('contacts.restore');
 
-        Route::get('categories', [DashboardController::class, 'categories']);
-        Route::post('add-category', [DashboardController::class, 'addCategory']);
-        Route::delete('delete-category/{id}', [DashboardController::class, 'deleteCategory']);
+        // AdminAction Routes
+        Route::resource('adminActions', AdminAdminActionController::class);
+        Route::post('adminActions/{id}/soft-delete', [AdminAdminActionController::class, 'softDelete'])->name('adminActions.softDelete');
+        Route::put('adminActions/{id}', [AdminAdminActionController::class, 'update'])->name('admin-adminActions.update');
+
     });
 
+    // Client Routes
+    Route::prefix('client')->middleware('role:client')->group(function () {
+        Route::get('/dashboard', [ClientDashboard::class, 'index'])->name('client.dashboard');
+    });
 
-
-
-    // Category Routes
-    Route::get('category', [App\Http\Controllers\Admin\CategoryController::class, 'index']);
-    Route::get('add-category', [App\Http\Controllers\Admin\CategoryController::class, 'create']);
-    Route::post('add-category', [App\Http\Controllers\Admin\CategoryController::class, 'store']);
-    Route::get('edit-category/{category_id}', [App\Http\Controllers\Admin\CategoryController::class, 'edit']);
-    Route::put('update-category/{category_id}', [App\Http\Controllers\Admin\CategoryController::class, 'update']);
-    Route::get('delete-category/{category_id}', [App\Http\Controllers\Admin\CategoryController::class, 'destroy']);
-    Route::get('restore-category/{category_id}', [App\Http\Controllers\Admin\CategoryController::class, 'restore']);
-
-
-// Dispute Routes
-    Route::get('dispute', [App\Http\Controllers\Admin\DisputeController::class, 'index']); // List all disputes
-    Route::get('add-dispute', [App\Http\Controllers\Admin\DisputeController::class, 'create']); // Show form to add a dispute
-    Route::post('add-dispute', [App\Http\Controllers\Admin\DisputeController::class, 'store']); // Store a new dispute
-    Route::get('edit-dispute/{dispute_id}', [App\Http\Controllers\Admin\DisputeController::class, 'edit']); // Show form to edit a dispute
-    Route::put('update-dispute/{dispute_id}', [App\Http\Controllers\Admin\DisputeController::class, 'update']); // Update a dispute
-    Route::get('delete-dispute/{dispute_id}', [App\Http\Controllers\Admin\DisputeController::class, 'destroy']); // Delete a dispute
-    Route::get('restore-dispute/{dispute_id}', [App\Http\Controllers\Admin\DisputeController::class, 'restore']); // Restore a deleted dispute (if soft delete is used)
-    Route::get('show-dispute/{dispute_id}', [App\Http\Controllers\Admin\DisputeController::class, 'show']); // Show a specific dispute
-
-
-
-
-
-
-        // Escrow Payment Routes
-        Route::get('escrowPayment', [EscrowPaymentController::class, 'index']);
-        Route::get('add-escrow-payment', [EscrowPaymentController::class, 'create']);
-        Route::post('add-escrow-payment', [EscrowPaymentController::class, 'store']);
-        Route::get('edit-escrow-payment/{payment_id}', [EscrowPaymentController::class, 'edit']);
-        Route::put('update-escrow-payment/{payment_id}', [EscrowPaymentController::class, 'update']);
-        Route::get('delete-escrow-payment/{payment_id}', [EscrowPaymentController::class, 'destroy']);
-// Job Bid Routes
-
-
-    Route::get('job-bids', [JobBidController::class, 'index'])->name('job-bids.index');
-    Route::get('add-job-bid', [JobBidController::class, 'create'])->name('job-bids.create');
-    Route::post('add-job-bid', [JobBidController::class, 'store'])->name('job-bids.store');
-    Route::get('edit-job-bid/{bid_id}', [JobBidController::class, 'edit'])->name('job-bids.edit');
-    Route::put('update-job-bid/{bid_id}', [JobBidController::class, 'update'])->name('job-bids.update');
-    Route::get('delete-job-bid/{bid_id}', [JobBidController::class, 'destroy'])->name('job-bids.destroy');
-
-
-
-
-// Technician Profile Routes
-    Route::get('technician_profiles', [App\Http\Controllers\Admin\TechnicianProfileController::class, 'index']);
-    Route::get('add-technician_profile', [App\Http\Controllers\Admin\TechnicianProfileController::class, 'create']);
-    Route::post('add-technician_profile', [App\Http\Controllers\Admin\TechnicianProfileController::class, 'store']);
-    Route::get('edit-technician_profile/{technician_profile_id}', [App\Http\Controllers\Admin\TechnicianProfileController::class, 'edit']);
-    Route::put('update-technician_profile/{technician_profile_id}', [App\Http\Controllers\Admin\TechnicianProfileController::class, 'update']);
-    Route::get('delete-technician_profile/{technician_profile_id}', [App\Http\Controllers\Admin\TechnicianProfileController::class, 'destroy']);
-    Route::get('restore-technician_profile/{technician_profile_id}', [App\Http\Controllers\Admin\TechnicianProfileController::class, 'restore']);
-
-
-    // Job Posting Routes
-    Route::get('jobPosting', [App\Http\Controllers\Admin\JobPostingController::class, 'index'])->name('admin.job_postings.index');
-    Route::get('add-jobPosting', [App\Http\Controllers\Admin\JobPostingController::class, 'create'])->name('admin.job_postings.create');
-    Route::post('add-jobPosting', [App\Http\Controllers\Admin\JobPostingController::class, 'store'])->name('admin.job_postings.store');
-    Route::get('edit-jobPosting/{jobPosting_id}', [App\Http\Controllers\Admin\JobPostingController::class, 'edit'])->name('admin.job_postings.edit');
-    Route::put('update-jobPosting/{jobPosting_id}', [App\Http\Controllers\Admin\JobPostingController::class, 'update'])->name('admin.job_postings.update');
-    Route::delete('delete-jobPosting/{jobPosting_id}', [App\Http\Controllers\Admin\JobPostingController::class, 'destroy'])->name('admin.job_postings.destroy');
-    Route::get('restore-jobPosting/{jobPosting_id}', [App\Http\Controllers\Admin\JobPostingController::class, 'restore'])->name('admin.job_postings.restore');
-
-
-
-
-    // Review Routes
-    Route::get('reviews', [ReviewController::class, 'index']);
-    Route::get('add-review', [ReviewController::class, 'create']);
-    Route::post('add-review', [ReviewController::class, 'store']);
-    Route::get('edit-review/{review_id}', [ReviewController::class, 'edit']);
-    Route::put('update-review/{review_id}', [ReviewController::class, 'update']);
-    Route::get('delete-review/{review_id}', [ReviewController::class, 'destroy']);
-    Route::get('restore-review/{review_id}', [ReviewController::class, 'restore']);
-
-
-
-    // Post Routes
-    Route::get('posts', [App\Http\Controllers\Admin\PostController::class, 'index']);
-    Route::get('add-post', [App\Http\Controllers\Admin\PostController::class, 'create']);
-    Route::post('add-post', [App\Http\Controllers\Admin\PostController::class, 'store']);
-    Route::get('post/{post_id}', [App\Http\Controllers\Admin\PostController::class, 'edit']);
-    Route::put('update-post/{post_id}', [App\Http\Controllers\Admin\PostController::class, 'update']);
-    Route::get('delete-post/{post_id}', [App\Http\Controllers\Admin\PostController::class, 'destroy']);
-
-    // User Routes
-    Route::get('users', [App\Http\Controllers\Admin\UserController::class, 'index']);
-    Route::get('user/{user_id}', [App\Http\Controllers\Admin\UserController::class, 'edit']);
-    Route::put('update-user/{user_id}', [App\Http\Controllers\Admin\UserController::class, 'update']);
-
-
-
-
-        Route::resource('contacts', ContactController::class);
-
-
+    // Technician Routes
+    Route::prefix('technician')->middleware('role:technician')->group(function () {
+        Route::get('/dashboard', [TechnicianDashboard::class, 'index'])->name('technician.dashboard');
+    });
 });
+
+require __DIR__.'/auth.php';

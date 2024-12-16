@@ -3,52 +3,43 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\DisputeFormRequest;
-use Illuminate\Http\Request;
 use App\Models\Dispute;
-
-
-
+use Illuminate\Http\Request;
 
 class DisputeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('role:admin');
+    }
+
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-        $disputes = Dispute::all();
-       return view('admin.dispute.index', compact('disputes'));
+        $disputes = Dispute::withTrashed()->get(); // Fetch all disputes, including soft-deleted ones
+        return view('admin.disputes.index', compact('disputes'));
     }
 
-    public function create()
+    /**
+     * Soft delete the dispute.
+     */
+    public function softDelete($id)
     {
-        // If needed, return a view for creating disputes
-        return view('admin.dispute.create');
+        $dispute = Dispute::findOrFail($id);
+        $dispute->delete(); // Soft delete the dispute
+        return response()->json(['success' => true]);
     }
 
-    public function store(DisputeFormRequest $request)
+    /**
+     * Restore the soft-deleted dispute.
+     */
+    public function restore($id)
     {
-        $dispute = Dispute::create($request->validated());
-        return response()->json(['message' => 'Dispute created successfully', 'data' => $dispute], 201);
-    }
-
-    public function show(Dispute $dispute)
-    {
-        return response()->json($dispute);
-    }
-
-    public function edit(Dispute $dispute)
-    {
-        // If needed, return a view for editing disputes
-    }
-
-    public function update(UpdateDisputeRequest $request, Dispute $dispute)
-    {
-        $dispute->update($request->validated());
-        return response()->json(['message' => 'Dispute updated successfully', 'data' => $dispute]);
-    }
-
-    public function destroy(Dispute $dispute)
-    {
-        $dispute->delete();
-        return response()->json(['message' => 'Dispute deleted successfully']);
+        $dispute = Dispute::withTrashed()->findOrFail($id);
+        $dispute->restore(); // Restore the soft-deleted dispute
+        return response()->json(['success' => true]);
     }
 }

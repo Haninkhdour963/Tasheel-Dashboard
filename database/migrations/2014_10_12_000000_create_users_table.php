@@ -14,11 +14,17 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email');
+            $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->enum('user_role', ['admin', 'client', 'technician'])->default('client'); // Add user_role enum
             $table->rememberToken();
-            $table->timestamps();
+            $table->timestamps(0);
+            $table->string('profile_image', 255)->nullable()->comment('Optional user profile picture');
+           $table->string('phone_number', 20);
+           $table->string('mobile_phone', 20)->nullable()->comment('Mobile phone number');
+           $table->string('location', 255)->nullable()->comment('User location');
+          $table->softDeletes();
         });
     }
 
@@ -27,6 +33,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('deleted_at');
+        });
     }
 };

@@ -8,18 +8,17 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class JobBid extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory,SoftDeletes;
 
-    protected $primaryKey = 'bid_id';
-    protected $fillable = ['job_id', 'Technician_id', 'bid_amount', 'bid_message', 'status'];
+    protected $fillable = ['job_id', 'technician_id', 'bid_amount', 'bid_message', 'status'];
 
-    public function jobPosting()
+    public function job()
     {
-        return $this->belongsTo(JobPosting::class, 'job_id', 'job_id');
+        return $this->belongsTo(JobPosting::class, 'job_id');
     }
 
-    public function technicianProfile()
+    public function technician()
     {
-        return $this->belongsTo(TechnicianProfile::class, 'Technician_id', 'Technician_id');
+        return $this->belongsTo(Technician::class, 'technician_id');
     }
 }
