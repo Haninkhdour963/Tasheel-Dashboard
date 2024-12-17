@@ -3,17 +3,27 @@
 namespace App\Http\Controllers\Technician;
 
 use App\Http\Controllers\Controller;
+use App\Models\Review;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('role:technician');
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        // Fetch all reviews, including soft-deleted ones
+        $reviews = Review::withTrashed()->get();
+        return view('technician.reviews.index', compact('reviews'));
     }
+
 
     /**
      * Show the form for creating a new resource.

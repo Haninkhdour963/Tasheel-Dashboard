@@ -61,6 +61,12 @@ class User extends Authenticatable
  {
      return $this->hasMany(AdminAction::class, 'target_user_id');
  }
+
+ // Define relationship with payments (for clients)
+ public function payments()
+ {
+     return $this->hasMany(Payment::class, 'client_id');
+ }
     /**
      * The attributes that should be hidden for serialization.
      *

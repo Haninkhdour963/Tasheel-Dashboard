@@ -3,16 +3,25 @@
 namespace App\Http\Controllers\Technician;
 
 use App\Http\Controllers\Controller;
+use App\Models\Contact;
 use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('role:technician');
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        // Fetch all contacts, including soft-deleted ones
+        $contacts = Contact::withTrashed()->get();
+        return view('technician.contacts.index', compact('contacts'));
     }
 
     /**

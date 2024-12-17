@@ -1,7 +1,12 @@
 <!-- partial:partials/_navbar.html -->
 <nav class="navbar default-layout-navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
     <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
-        <a class="navbar-brand brand-logo" href="{{ route('admin.dashboard') }}">Tas'heel</a>
+        <!-- Dynamically change the route based on user role -->
+        @php
+            $route = Auth::user()->isAdmin() ? 'admin.dashboard' :
+                     (Auth::user()->isClient() ? 'client.dashboard' : 'technician.dashboard');
+        @endphp
+        <a class="navbar-brand brand-logo" href="{{ route($route) }}">Tas'heel</a>
     </div>
     <div class="navbar-menu-wrapper d-flex align-items-stretch">
         <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
@@ -21,18 +26,15 @@
             <li class="nav-item nav-profile dropdown">
                 <a class="nav-link dropdown-toggle" id="profileDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
                     <div class="nav-profile-img">
-                        <!-- Correct the image source using the asset function -->
-                        <img src="{{ asset('storage/' . Auth::user()->profile_image) }}" alt="image">
+                        <!-- Correct the image source using the asset function and fallback image if not present -->
+                        <img src="{{ asset('storage/' . (Auth::user()->profile_image ?? 'default-profile.png')) }}" alt="Profile image">
                         <span class="availability-status online"></span>
                     </div>
                     <div class="nav-profile-text">
-                        <!-- Display the user's name dynamically based on their role -->
-                        <p class="mb-1 text-black">
-                            {{ Auth::user()->name }} <!-- Display user's name -->
-                        </p>
+                        <p class="mb-1 text-black">{{ Auth::user()->name }}</p>
                         <p class="mb-1 text-black" style="font-size: 12px; color: #6c757d;">
-                            @if(Auth::user()->isAdmin()) Admin 
-                            @elseif(Auth::user()->isClient()) Client 
+                            @if(Auth::user()->isAdmin()) Admin
+                            @elseif(Auth::user()->isClient()) Client
                             @else Technician @endif
                         </p>
                         <i class="bi bi-chevron-down"></i>

@@ -3,16 +3,26 @@
 namespace App\Http\Controllers\Technician;
 
 use App\Http\Controllers\Controller;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('role:technician');
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        // Paginate Payments with related job and client and technician data
+        $payments = Payment::with(['job', 'client', 'technician'])->paginate(15);
+    
+        return view('technician.payments.index', compact('payments'));
     }
 
     /**

@@ -3,16 +3,39 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\EscrowPayment;
 use Illuminate\Http\Request;
 
 class EscrowPaymentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('role:client'); // Ensure the user has the 'client' role
+    }
+    
     /**
      * Display a listing of the resource.
      */
-    public function index()
+   // Example for EscrowPaymentController
+public function index()
+{
+    // Paginate EscrowPayments with related job and client data
+    $escrowPayments = EscrowPayment::with(['job', 'client', 'technician'])->withTrashed()->paginate(15);
+    
+    return view('client.escrowPayments.index', compact('escrowPayments'));
+}
+
+    
+    /**
+     * Soft delete the EscrowPayment.
+     */
+    public function softDelete($id)
     {
-        //
+        $escrowPayment = EscrowPayment::findOrFail($id);
+        $escrowPayment->delete();  // Soft delete the escrow payment
+    
+        return response()->json(['success' => true]);
     }
 
     /**

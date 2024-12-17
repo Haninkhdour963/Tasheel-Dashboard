@@ -3,18 +3,26 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\Review;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('role:client');
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        // Fetch all reviews, including soft-deleted ones
+        $reviews = Review::withTrashed()->get();
+        return view('client.reviews.index', compact('reviews'));
     }
-
     /**
      * Show the form for creating a new resource.
      */

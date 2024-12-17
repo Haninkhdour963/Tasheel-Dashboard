@@ -7,8 +7,7 @@
     <title>@yield('title', 'Admin Dashboard')</title>
     <!-- CSS Links -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="{{ asset('assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css') }}">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
@@ -28,37 +27,50 @@
     <link rel="stylesheet" href="{{asset('assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.css')}}">
 
     <!-- Layout styles -->
-
     <link rel="shortcut icon" href="{{asset('assets/images/favicon.png')}}" />
- <!-- SweetAlert Script -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    
+    <!-- SweetAlert Script -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
-@include('layouts.inc.admin-navbar')
+    @include('layouts.inc.admin-navbar')
 
     <div class="container-fluid page-body-wrapper">
-        @include('layouts.inc.admin-sidebar')
+        @if(Auth::check()) <!-- Check if the user is logged in -->
+            @if(Auth::user()->isAdmin()) <!-- Check if the logged-in user is an Admin -->
+                @include('layouts.inc.admin-sidebar')
+            @elseif(Auth::user()->isTechnician()) <!-- Check if the logged-in user is a Technician -->
+                @include('layouts.inc.technician-sidebar')
+            @else <!-- Default to Client sidebar if the user is neither Admin nor Technician -->
+                @include('layouts.inc.client-sidebar')
+            @endif
+        @endif
+
         <div class="main-panel">
             <div class="content-wrapper">
                 @yield('content')
             </div>
         </div>
     </div>
-
-    @include('layouts.inc.admin-footer')
-
+    @if(Auth::check()) <!-- Check if the user is logged in -->
+            @if(Auth::user()->isAdmin()) <!-- Check if the logged-in user is an Admin -->
+            @include('layouts.inc.admin-footer')
+            @elseif(Auth::user()->isTechnician()) 
+            @include('layouts.inc.technician-footer')
+            @else
+            @include('layouts.inc.client-footer')
+            @endif
+        @endif
+   
     <!-- JavaScript Links -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{{ asset('assets/vendors/js/vendor.bundle.base.js') }}"></script>
     <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
     <script src="{{ asset('assets/js/misc.js') }}"></script>
 
-     <!-- Plugins: JS -->
-     
+    <!-- Plugins: JS -->
     <script src="{{asset('assets/vendors/bootstrap-datepicker/bootstrap-datepicker.min.js')}}"></script>
     <script src="{{asset('assets/js/off-canvas.js')}}"></script>
     <script src="{{asset('assets/js/misc.js')}}"></script>

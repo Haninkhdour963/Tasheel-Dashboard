@@ -25,6 +25,7 @@ class AdminActionController extends Controller
     // Store route for creating/updating an admin action
     public function store(Request $request, $id = null)
     {
+        // Validate the incoming request data
         $request->validate([
             'action_type' => 'required|in:ban_user,approve_profile,resolve_dispute',
             'description' => 'nullable|string|max:1000',
@@ -34,7 +35,8 @@ class AdminActionController extends Controller
         // If ID is provided, update the existing action, otherwise create a new one
         $adminAction = $id ? AdminAction::find($id) : new AdminAction;
 
-        if (!$adminAction) {
+        if (!$adminAction && $id) {
+            // Return a 404 error if the admin action does not exist
             return response()->json(['error' => 'Admin action not found'], 404);
         }
 
@@ -50,14 +52,10 @@ class AdminActionController extends Controller
     // Soft delete route
     public function softDelete($id)
     {
-        $adminAction = AdminAction::find($id);
-
-        // Check if the admin action exists
-        if (!$adminAction) {
-            return response()->json(['error' => 'Admin action not found'], 404);
-        }
-
-        // Soft delete the action
+        // Fetch the admin action using its ID
+        $adminAction = AdminAction::findOrFail($id);
+        
+        // Soft delete the admin action
         $adminAction->delete();
 
         return response()->json(['success' => true]);
