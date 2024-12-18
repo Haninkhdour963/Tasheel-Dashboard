@@ -28,7 +28,15 @@
                                
                                 <td>{{ $user->name }}</td>
                                 <td>{{ $user->email }}</td>
-                                <td>{{ $user->profile_image }}</td>
+                               
+                                <td>
+                                    @if($user->profile_image)
+                                        <img src="{{ asset('storage/' . $user->profile_image) }}" alt="User Image" style="width: 50px; height: 50px; object-fit: cover;">
+                                    @else
+                                        <span>No Image</span>
+                                    @endif
+                                </td>
+
                                 <td>{{ $user->phone_number }}</td>
                                 <td>{{ $user->mobile_phone }}</td>
                                 <td>{{ $user->location }}</td>

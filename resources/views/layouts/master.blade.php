@@ -16,6 +16,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
 
     <title>User Management</title>
 
@@ -38,13 +40,16 @@
     @include('layouts.inc.admin-navbar')
 
     <div class="container-fluid page-body-wrapper">
-        @if(Auth::check()) <!-- Check if the user is logged in -->
+  
+    @if(Auth::check()) <!-- Check if the user is logged in -->
             @if(Auth::user()->isAdmin()) <!-- Check if the logged-in user is an Admin -->
                 @include('layouts.inc.admin-sidebar')
             @elseif(Auth::user()->isTechnician()) <!-- Check if the logged-in user is a Technician -->
                 @include('layouts.inc.technician-sidebar')
-            @else <!-- Default to Client sidebar if the user is neither Admin nor Technician -->
+                @elseif(Auth::user()->isClient())
                 @include('layouts.inc.client-sidebar')
+            @else <!-- Default to Client sidebar if the user is neither Admin nor Technician -->
+                @include('/')
             @endif
         @endif
 

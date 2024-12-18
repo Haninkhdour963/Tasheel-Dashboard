@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Technician;
 use App\Http\Controllers\Controller;
 use App\Models\Technician;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TechnicianController extends Controller
 {
@@ -18,24 +19,34 @@ class TechnicianController extends Controller
      * Display a listing of the resource.
      */
     public function index()
-    {
-        // Fetch all technicians, including soft-deleted ones
-        $technicians = Technician::withTrashed()->get();
-        return view('technician.technicians.index', compact('technicians'));
-    }
+{
+    // Get the currently authenticated technician
+    $technician = Auth::user();
+    
+    // Pass only the current technician's data to the view
+    return view('technician.technicians.index', compact('technician'));
+}
+
 
     /**
      * Soft delete the technician.
      */
-    public function softDelete($id)
-    {
-        $technician = Technician::findOrFail($id);
+ // Soft delete a user
 
-        // Soft delete the technician
-        $technician->delete();
+ public function softDelete($id)
+{
+    $technician = Technician::findOrFail($id);
 
-        return response()->json(['success' => true]);
+    // تحقق إذا كان قد تم حذفه بالفعل
+    if ($technician->deleted_at) {
+        return response()->json(['success' => false, 'message' => 'User already deleted.']);
     }
+
+    $technician->delete(); // تنفيذ الحذف الناعم
+    return response()->json(['success' => true, 'message' => 'User soft deleted successfully.']);
+}
+
+
 
     /**
      * Show the form for creating a new resource.

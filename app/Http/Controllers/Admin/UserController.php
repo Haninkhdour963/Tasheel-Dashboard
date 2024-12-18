@@ -43,7 +43,7 @@ class UserController extends Controller
         $user->save();
     
         // Redirect to the users list page or wherever you want
-        return redirect()->route('users.index')->with('success', 'User created successfully');
+        return redirect()->route('admin.users.index')->with('success', 'User created successfully');
     }
     
 
@@ -72,7 +72,7 @@ class UserController extends Controller
       $user->user_role = $request->input('user_role');
       $user->save();
 
-      return redirect()->route('users.index')->with('success', 'User updated successfully');
+      return redirect()->route('admin.users.index')->with('success', 'User updated successfully');
   }
 
 

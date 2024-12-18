@@ -3,17 +3,27 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('role:client');
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        // Paginate Payments with related job and client and technician data
+        $payments = Payment::with(['job', 'client'])->paginate(15);
+    
+        return view('client.payments.index', compact('payments'));
     }
+
 
     /**
      * Show the form for creating a new resource.

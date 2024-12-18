@@ -208,6 +208,7 @@
             const form = new FormData(e.target);
             try {
                 const response = await fetch(`/admin/actions/${document.getElementById('editAdminActionId').value}`, {
+
                     method: 'PUT',
                     body: form,
                     headers: {
@@ -239,7 +240,8 @@
                 }).then(async (result) => {
                     if (result.isConfirmed) {
                         try {
-                            const response = await fetch(`/admin/actions/${actionId}/soft-delete`, {
+                            const response = await fetch(`/admin/adminActions/${actionId}/soft-delete`, {
+
                                 method: 'POST',
                                 headers: {
                                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
